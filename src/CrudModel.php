@@ -5,9 +5,18 @@ namespace Simplon\Mysql;
 abstract class CrudModel extends Data implements CrudModelInterface
 {
     /**
+     * @param array $data
+     *
      * @return static
      */
-    public function beforeSave()
+    public function fromPost(array $data): static {
+        return $this->fromArray($data, false);
+    }
+
+    /**
+     * @return static
+     */
+    public function beforeSave(): static
     {
         return $this;
     }
@@ -15,7 +24,7 @@ abstract class CrudModel extends Data implements CrudModelInterface
     /**
      * @return static
      */
-    public function beforeUpdate()
+    public function beforeUpdate(): static
     {
         return $this;
     }
