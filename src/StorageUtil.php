@@ -2,8 +2,6 @@
 
 namespace Simplon\Mysql;
 
-use Simplon\Helper\SecurityUtil;
-
 class StorageUtil
 {
     /**

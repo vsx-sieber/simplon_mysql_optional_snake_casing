@@ -7,7 +7,7 @@ abstract class Data implements DataInterface
     /**
      * @var string
      */
-    private $internalChecksum;
+    private string $internalChecksum;
 
     /**
      * @param array|null $data
@@ -36,14 +36,14 @@ abstract class Data implements DataInterface
      *
      * @return static
      */
-    public function fromArray(array $data, bool $buildChecksum = true)
+    public function fromArray(array $data, bool $buildChecksum = true): static
     {
         if ($data)
         {
             foreach ($data as $fieldName => $val)
             {
                 // format field name
-                if (strpos($fieldName, '_') !== false)
+                if (str_contains($fieldName, '_'))
                 {
                     $fieldName = self::camelCaseString($fieldName);
                 }
@@ -61,7 +61,6 @@ abstract class Data implements DataInterface
                 if (property_exists($this, $fieldName))
                 {
                     $this->$fieldName = $val;
-                    continue;
                 }
             }
 
@@ -92,7 +91,7 @@ abstract class Data implements DataInterface
             $getMethodName = 'get' . ucfirst($fieldName);
 
             // format field name
-            if ($snakeCase === true && strpos($fieldName, '_') === false)
+            if ($snakeCase === true && !str_contains($fieldName, '_'))
             {
                 $fieldName = self::snakeCaseString($fieldName);
             }
@@ -110,7 +109,6 @@ abstract class Data implements DataInterface
                 if ($propertyName !== 'internalChecksum')
                 {
                     $result[$fieldName] = $this->$propertyName;
-                    continue;
                 }
             }
         }
@@ -136,17 +134,17 @@ abstract class Data implements DataInterface
      *
      * @return static
      */
-    public function fromJson(string $json, bool $buildChecksum = true)
+    public function fromJson(string $json, bool $buildChecksum = true): static
     {
         return $this->fromArray(json_decode($json, true), $buildChecksum);
     }
 
     /**
-     * @param $string
+     * @param string $string
      *
      * @return string
      */
-    protected static function snakeCaseString($string)
+    protected static function snakeCaseString(string $string): string
     {
         return strtolower(preg_replace('/([A-Z1-9])/', '_\\1', $string));
     }
@@ -156,7 +154,7 @@ abstract class Data implements DataInterface
      *
      * @return string
      */
-    protected static function camelCaseString($string)
+    protected static function camelCaseString(string $string): string
     {
         $string = strtolower($string);
         $string = ucwords(str_replace('_', ' ', $string));
@@ -193,7 +191,7 @@ abstract class Data implements DataInterface
             $propertyName = $fieldName;
 
             // format field name
-            if ($snakeCase === true && strpos($fieldName, '_') === false)
+            if ($snakeCase === true && !str_contains($fieldName, '_'))
             {
                 $fieldName = self::snakeCaseString($fieldName);
             }
@@ -210,7 +208,6 @@ abstract class Data implements DataInterface
                     }
 
                     $result[$fieldName] = $value;
-                    continue;
                 }
             }
         }

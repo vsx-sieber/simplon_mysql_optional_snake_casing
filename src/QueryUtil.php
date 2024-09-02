@@ -27,9 +27,9 @@ class QueryUtil
             $strippedConds[$strippedKey] = $data;
 
             // handle only columns (non-column conds are prepend with "_")
-            if (substr($key, 0, 1) !== '_')
+            if (!str_starts_with($key, '_'))
             {
-                $key = strpos($key, '.') !== false ? $key : '`' . $key . '`';
+                $key = str_contains($key, '.') ? $key : '`' . $key . '`';
                 $query = $key . ' ' . $operator . ' :' . $strippedKey;
 
                 if ($value === null)
