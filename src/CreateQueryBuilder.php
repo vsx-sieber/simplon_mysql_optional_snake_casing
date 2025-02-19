@@ -17,6 +17,10 @@ class CreateQueryBuilder extends AbstractBuilder
      */
     protected $insertIgnore = false;
     /**
+     * @var bool
+     */
+    protected $useSnakeCasing = true;
+    /**
      * @var array
      */
     protected $data;
@@ -80,15 +84,33 @@ class CreateQueryBuilder extends AbstractBuilder
     }
 
     /**
-     * @param bool $snakeCase
-     * 
+     * @return boolean
+     */
+    public function isUsingSnakeCasing(): bool
+    {
+        return $this->useSnakeCasing;
+    }
+
+    /**
+     * @param bool $useSnakeCasing
+     *
+     * @return CreateQueryBuilder
+     */
+    public function setUseSnakeCasing($useSnakeCasing): self
+    {
+        $this->useSnakeCasing = $useSnakeCasing;
+
+        return $this;
+    }
+
+    /**
      * @return array
      */
-    public function getData(bool $snakeCase = true): array
+    public function getData(): array
     {
         if ($this->getModel() instanceof CrudModelInterface)
         {
-            return $this->getModel()->toArray($snakeCase);
+            return $this->getModel()->toArray($this->$useSnakeCasing);
         }
 
         return $this->data;
