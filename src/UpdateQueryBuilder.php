@@ -84,13 +84,15 @@ class UpdateQueryBuilder extends AbstractBuilder
     }
 
     /**
+     * @param bool $snakeCase
+     * 
      * @return array
      */
-    public function getData(): array
+    public function getData(bool $snakeCase = true): array
     {
         if ($this->getModel() instanceof CrudModelInterface)
         {
-            return $this->getModel()->toArray();
+            return $this->getModel()->toArray($snakeCase);
         }
 
         return $this->data;

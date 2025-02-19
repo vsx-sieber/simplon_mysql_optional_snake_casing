@@ -27,17 +27,18 @@ class CrudManager
 
     /**
      * @param CreateQueryBuilder $builder
-     *
+     * @param bool $snakeCase
+     * 
      * @return CrudModelInterface
      * @throws MysqlException
      */
-    public function create(CreateQueryBuilder $builder): CrudModelInterface
+    public function create(CreateQueryBuilder $builder, bool $snakeCase = true): CrudModelInterface
     {
         $builder->getModel()->beforeSave();
 
         $insertId = $this->getMysql()->insert(
             $builder->getTableName(),
-            $builder->getData(),
+            $builder->getData($snakeCase),
             $builder->isInsertIgnore()
         )
         ;
@@ -95,11 +96,12 @@ class CrudManager
 
     /**
      * @param UpdateQueryBuilder $builder
+     * @param bool $snakeCase
      *
      * @return CrudModelInterface
      * @throws MysqlException
      */
-    public function update(UpdateQueryBuilder $builder): CrudModelInterface
+    public function update(UpdateQueryBuilder $builder, bool $snakeCase = true): CrudModelInterface
     {
         $builder->getModel()->beforeUpdate();
 
@@ -117,7 +119,7 @@ class CrudManager
         $this->getMysql()->update(
             $builder->getTableName(),
             $conds,
-            $builder->getData(),
+            $builder->getData($snakeCase),
             $condsQuery
         )
         ;

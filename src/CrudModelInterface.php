@@ -27,7 +27,9 @@ interface CrudModelInterface
     public function fromArray(array $data);
 
     /**
+     * @param bool $snakeCase
+     * 
      * @return array
      */
-    public function toArray(): array;
+    public function toArray(bool $snakeCase): array;
 }
