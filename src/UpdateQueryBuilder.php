@@ -114,7 +114,7 @@ class UpdateQueryBuilder extends AbstractBuilder
     {
         if ($this->getModel() instanceof CrudModelInterface)
         {
-            return $this->getModel()->toArray($this->$useSnakeCasing);
+            return $this->getModel()->toArray($this->useSnakeCasing);
         }
 
         return $this->data;
