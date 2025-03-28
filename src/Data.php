@@ -19,13 +19,6 @@ abstract class Data implements DataInterface
      */
     public function __construct(?array $data = null)
     {
-        if ($data)
-        {
-            $this->fromArray($data, false);
-        }
-
-        $this->internalChecksum = $this->calcMd5($this->toRawArray());
-
         $this->useCustomFieldNames = false;
         try {
             new \ReflectionClassConstant(get_class($this), '__PROPERTY_FIELDNAMES');
@@ -33,6 +26,13 @@ abstract class Data implements DataInterface
         } catch (\ReflectionException) {
             // do nothing
         }
+
+        if ($data)
+        {
+            $this->fromArray($data, false);
+        }
+
+        $this->internalChecksum = $this->calcMd5($this->toRawArray());
     }
 
     /**
@@ -203,7 +203,7 @@ abstract class Data implements DataInterface
         try {
             $constantReflex = new \ReflectionClassConstant(get_class($this), '__PROPERTY_FIELDNAMES');
             return $constantReflex->getValue();
-        } catch (\ReflectionException $e) {
+        } catch (\ReflectionException) {
             return NULL;
         }
     }
