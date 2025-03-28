@@ -91,9 +91,24 @@ abstract class Data implements DataInterface
             $getMethodName = 'get' . ucfirst($fieldName);
 
             // format field name
-            if ($snakeCase === true && !str_contains($fieldName, '_'))
+            if ($snakeCase === true)
             {
-                $fieldName = self::snakeCaseString($fieldName);
+                if (!str_contains($fieldName, '_')) {
+                    $fieldName = self::snakeCaseString($fieldName);
+                }
+            }
+            else {
+                $fieldNameDefinition = self::snakeCaseString($fieldName);
+                $fieldNameDefinition = strtoupper($fieldNameDefinition);
+                $fieldNameDefinition = 'COLUMN_' . $fieldNameDefinition;
+
+                $class_name = get_class($this); // fully-qualified class name
+                try {
+                    $constant_reflex = new \ReflectionClassConstant($class_name, $fieldNameDefinition);
+                    $fieldNameDefinition = $constant_reflex->getValue();
+                } catch (\ReflectionException $e) {
+                    
+                }
             }
 
             // get from getter
