@@ -102,12 +102,12 @@ abstract class Data implements DataInterface
                 $fieldNameDefinition = strtoupper($fieldNameDefinition);
                 $fieldNameDefinition = 'COLUMN_' . $fieldNameDefinition;
 
-                $class_name = get_class($this); // fully-qualified class name
+                $className = get_class($this); // fully-qualified class name
                 try {
-                    $constant_reflex = new \ReflectionClassConstant($class_name, $fieldNameDefinition);
-                    $fieldNameDefinition = $constant_reflex->getValue();
+                    $constantReflex = new \ReflectionClassConstant($className, $fieldNameDefinition);
+                    $fieldNameDefinition = $constantReflex->getValue();
                 } catch (\ReflectionException $e) {
-                    error_log($e->getMessage());
+                    // do nothing
                 }
             }
 

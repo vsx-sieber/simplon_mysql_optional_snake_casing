@@ -70,6 +70,8 @@ class Mysql
     {
         $dbh = $this->getPdo();
 
+        log($query);
+
         $response = $dbh->exec($query);
 
         if ($response !== false)
