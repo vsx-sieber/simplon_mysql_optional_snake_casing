@@ -70,8 +70,6 @@ class Mysql
     {
         $dbh = $this->getPdo();
 
-        error_log($query);
-
         $response = $dbh->exec($query);
 
         if ($response !== false)
@@ -268,6 +266,8 @@ class Mysql
         {
             throw new MysqlException("Multi-dimensional datasets are not allowed. Use 'Mysql::insertMany()' instead");
         }
+
+        log(json_encode($data));
 
         $response = $this->insertMany($tableName, [$data], $insertIgnore);
 
