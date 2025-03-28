@@ -12,20 +12,19 @@ abstract class Data implements DataInterface
     /**
      * @var bool
      */
-    private bool $useCustomFieldNames = false;
+    private bool $useCustomFieldNames;
 
     /**
      * @param array|null $data
      */
     public function __construct(?array $data = null)
     {
-        $this->useCustomFieldNames = false;
         try {
             new \ReflectionClassConstant(get_class($this), '__PROPERTY_FIELDNAMES');
             $this->useCustomFieldNames = true;
             error_log('using custom field names for ' . get_class($this));
         } catch (\ReflectionException) {
-            // do nothing
+            $this->useCustomFieldNames = false;
             error_log('no using custom field names for ' . get_class($this));
         }
 
@@ -61,21 +60,17 @@ abstract class Data implements DataInterface
         {
             foreach ($data as $fieldName => $val)
             {
-                $propertyName = $this->useCustomFieldNames ? $this->getPropertyNameFromCustomFieldName($fieldName) : null;
+                $propertyName = ($this->useCustomFieldNames === true) ? $this->getPropertyNameFromCustomFieldName($fieldName) : null;
                 if (is_null($propertyName))
                 {
                     // format field name
                     if (str_contains($fieldName, '_'))
                     {
-                        $fieldName = self::camelCaseString($fieldName);
+                        $propertyName = self::camelCaseString($fieldName);
                     }
                 }
-                else
-                {
-                    $fieldName = $propertyName;
-                }
 
-                $setMethodName = 'set' . ucfirst($fieldName);
+                $setMethodName = 'set' . ucfirst($propertyName);
 
                 // set on setter
                 if (method_exists($this, $setMethodName))
@@ -85,9 +80,9 @@ abstract class Data implements DataInterface
                 }
 
                 // set on field
-                if (property_exists($this, $fieldName))
+                if (property_exists($this, $propertyName))
                 {
-                    $this->$fieldName = $val;
+                    $this->$propertyName = $val;
                 }
             }
 
@@ -109,21 +104,21 @@ abstract class Data implements DataInterface
     {
         $result = [];
 
-        $visibleFields = get_class_vars(get_called_class());
+        $visibleProps = get_class_vars(get_called_class());
 
         // render column names
-        foreach ($visibleFields as $fieldName => $value)
+        foreach ($visibleProps as $propertyName => $value)
         {
-            $propertyName = $fieldName;
-            $getMethodName = 'get' . ucfirst($fieldName);
+            $fieldName = $propertyName;
+            $getMethodName = 'get' . ucfirst($propertyName);
 
-            $customFieldName = $this->useCustomFieldNames ? $this->getCustomFieldNameFromPropertyName($propertyName) : null;
+            $customFieldName = ($this->useCustomFieldNames === true) ? $this->getCustomFieldNameFromPropertyName($propertyName) : null;
             if (is_null($customFieldName))
             {
                 // format field name
-                if ($snakeCase === true && !str_contains($fieldName, '_'))
+                if ($snakeCase === true && !str_contains($propertyName, '_'))
                 {
-                    $fieldName = self::snakeCaseString($fieldName);
+                    $fieldName = self::snakeCaseString($propertyName);
                 }
             }
             else
@@ -134,7 +129,7 @@ abstract class Data implements DataInterface
             // get from getter
             if (method_exists($this, $getMethodName))
             {
-                $result[$fieldName] = $this->$getMethodName();
+                $result[$propertyName] = $this->$getMethodName();
                 continue;
             }
 
@@ -143,7 +138,7 @@ abstract class Data implements DataInterface
             {
                 if ($propertyName !== 'internalChecksum')
                 {
-                    $result[$fieldName] = $this->$propertyName;
+                    $result[$propertyName] = $this->$propertyName;
                 }
             }
         }
