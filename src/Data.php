@@ -42,10 +42,18 @@ abstract class Data implements DataInterface
         {
             foreach ($data as $fieldName => $val)
             {
-                // format field name
-                if (str_contains($fieldName, '_'))
+                $propertyName = $this->getPropertyNameFromCustomFieldName($fieldName);
+                if (is_null($propertyName))
                 {
-                    $fieldName = self::camelCaseString($fieldName);
+                    // format field name
+                    if (str_contains($fieldName, '_'))
+                    {
+                        $fieldName = self::camelCaseString($fieldName);
+                    }
+                }
+                else
+                {
+                    $fieldName = $propertyName;
                 }
 
                 $setMethodName = 'set' . ucfirst($fieldName);
@@ -90,25 +98,18 @@ abstract class Data implements DataInterface
             $propertyName = $fieldName;
             $getMethodName = 'get' . ucfirst($fieldName);
 
-            // format field name
-            if ($snakeCase === true)
+            $customFieldName = $this->getCustomFieldNameFromPropertyName($propertyName);
+            if (is_null($customFieldName))
             {
-                if (!str_contains($fieldName, '_')) {
+                // format field name
+                if ($snakeCase === true && !str_contains($fieldName, '_'))
+                {
                     $fieldName = self::snakeCaseString($fieldName);
                 }
             }
-            else {
-                $fieldNameDefinition = self::snakeCaseString($fieldName);
-                $fieldNameDefinition = strtoupper($fieldNameDefinition);
-                $fieldNameDefinition = 'COLUMN_' . $fieldNameDefinition;
-
-                $className = get_class($this); // fully-qualified class name
-                try {
-                    $constantReflex = new \ReflectionClassConstant($className, $fieldNameDefinition);
-                    $fieldName = $constantReflex->getValue();
-                } catch (\ReflectionException $e) {
-                    // do nothing
-                }
+            else
+            {
+                $fieldName = $customFieldName;
             }
 
             // get from getter
@@ -175,6 +176,54 @@ abstract class Data implements DataInterface
         $string = ucwords(str_replace('_', ' ', $string));
 
         return lcfirst(str_replace(' ', '', $string));
+    }
+
+    /**
+     * @return ?array
+     */
+    private function getCustomPropertyFieldNames(): ?array
+    {
+        $className = get_class($this); // fully-qualified class name
+        try {
+            $constantReflex = new \ReflectionClassConstant($className, '__PROPERTY_FIELDNAMES');
+            return $constantReflex->getValue();
+        } catch (\ReflectionException $e) {
+            return NULL;
+        }
+    }
+
+    /**
+     * @param string $propertyName
+     *
+     * @return ?string
+     */
+    private function getCustomFieldNameFromPropertyName(string $propertyName): ?string
+    {
+        $customPropertyFieldNames = $this->getCustomPropertyFieldNames();
+
+        if (array_key_exists($propertyName, $customPropertyFieldNames) === false) {
+            return NULL;
+        }
+        else {
+            return $customPropertyFieldNames[$propertyName];
+        }
+    }
+
+    /**
+     * @param string $customFieldName
+     *
+     * @return ?string
+     */
+    private function getPropertyNameFromCustomFieldName(string $customFieldName): ?string
+    {
+        $customPropertyFieldNames = $this->getCustomPropertyFieldNames();
+        $propertyName = array_search($customFieldName, $customPropertyFieldNames);
+
+        if ($propertyName !== false) {
+            return $propertyName;
+        } else {
+            return NULL;
+        }
     }
 
     /**
