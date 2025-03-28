@@ -267,8 +267,6 @@ class Mysql
             throw new MysqlException("Multi-dimensional datasets are not allowed. Use 'Mysql::insertMany()' instead");
         }
 
-        error_log(json_encode($data));
-
         $response = $this->insertMany($tableName, [$data], $insertIgnore);
 
         if ($response === false)

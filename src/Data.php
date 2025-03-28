@@ -105,7 +105,7 @@ abstract class Data implements DataInterface
                 $className = get_class($this); // fully-qualified class name
                 try {
                     $constantReflex = new \ReflectionClassConstant($className, $fieldNameDefinition);
-                    $fieldNameDefinition = $constantReflex->getValue();
+                    $fieldName = $constantReflex->getValue();
                 } catch (\ReflectionException $e) {
                     // do nothing
                 }
