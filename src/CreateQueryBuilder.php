@@ -84,33 +84,13 @@ class CreateQueryBuilder extends AbstractBuilder
     }
 
     /**
-     * @return boolean
-     */
-    public function isUsingSnakeCasing(): bool
-    {
-        return $this->useSnakeCasing;
-    }
-
-    /**
-     * @param bool $useSnakeCasing
-     *
-     * @return CreateQueryBuilder
-     */
-    public function setUseSnakeCasing($useSnakeCasing): self
-    {
-        $this->useSnakeCasing = $useSnakeCasing;
-
-        return $this;
-    }
-
-    /**
      * @return array
      */
     public function getData(): array
     {
         if ($this->getModel() instanceof CrudModelInterface)
         {
-            return $this->getModel()->toArray($this->useSnakeCasing);
+            return $this->getModel()->toArray();
         }
 
         return $this->data;

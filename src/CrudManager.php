@@ -37,7 +37,7 @@ class CrudManager
 
         $insertId = $this->getMysql()->insert(
             $builder->getTableName(),
-            $builder->getData($builder->isUsingSnakeCasing()),
+            $builder->getData(),
             $builder->isInsertIgnore()
         )
         ;
@@ -117,7 +117,7 @@ class CrudManager
         $this->getMysql()->update(
             $builder->getTableName(),
             $conds,
-            $builder->getData($builder->isUsingSnakeCasing()),
+            $builder->getData(),
             $condsQuery
         )
         ;

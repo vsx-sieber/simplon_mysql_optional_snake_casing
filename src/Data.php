@@ -10,6 +10,11 @@ abstract class Data implements DataInterface
     private string $internalChecksum;
 
     /**
+     * @var bool
+     */
+    private bool $useCustomFieldNames = false;
+
+    /**
      * @param array|null $data
      */
     public function __construct(?array $data = null)
@@ -20,6 +25,14 @@ abstract class Data implements DataInterface
         }
 
         $this->internalChecksum = $this->calcMd5($this->toRawArray());
+
+        $this->useCustomFieldNames = false;
+        try {
+            new \ReflectionClassConstant(get_class($this), '__PROPERTY_FIELDNAMES');
+            $this->useCustomFieldNames = true;
+        } catch (\ReflectionException) {
+            // do nothing
+        }
     }
 
     /**
@@ -28,6 +41,10 @@ abstract class Data implements DataInterface
     public function isChanged(): bool
     {
         return $this->internalChecksum !== $this->calcMd5($this->toRawArray());
+    }
+
+    public function useCustomFieldNames(bool $value): void {
+        $this->useCustomFieldNames = $value;
     }
 
     /**
@@ -42,7 +59,7 @@ abstract class Data implements DataInterface
         {
             foreach ($data as $fieldName => $val)
             {
-                $propertyName = $this->getPropertyNameFromCustomFieldName($fieldName);
+                $propertyName = $this->useCustomFieldNames ? $this->getPropertyNameFromCustomFieldName($fieldName) : null;
                 if (is_null($propertyName))
                 {
                     // format field name
@@ -98,7 +115,7 @@ abstract class Data implements DataInterface
             $propertyName = $fieldName;
             $getMethodName = 'get' . ucfirst($fieldName);
 
-            $customFieldName = $this->getCustomFieldNameFromPropertyName($propertyName);
+            $customFieldName = $this->useCustomFieldNames ? $this->getCustomFieldNameFromPropertyName($propertyName) : null;
             if (is_null($customFieldName))
             {
                 // format field name
@@ -183,9 +200,8 @@ abstract class Data implements DataInterface
      */
     private function getCustomPropertyFieldNames(): ?array
     {
-        $className = get_class($this); // fully-qualified class name
         try {
-            $constantReflex = new \ReflectionClassConstant($className, '__PROPERTY_FIELDNAMES');
+            $constantReflex = new \ReflectionClassConstant(get_class($this), '__PROPERTY_FIELDNAMES');
             return $constantReflex->getValue();
         } catch (\ReflectionException $e) {
             return NULL;
