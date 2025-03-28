@@ -23,8 +23,10 @@ abstract class Data implements DataInterface
         try {
             new \ReflectionClassConstant(get_class($this), '__PROPERTY_FIELDNAMES');
             $this->useCustomFieldNames = true;
+            error_log('using custom field names for ' . get_class($this));
         } catch (\ReflectionException) {
             // do nothing
+            error_log('no using custom field names for ' . get_class($this));
         }
 
         if ($data)
