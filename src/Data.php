@@ -105,7 +105,6 @@ abstract class Data implements DataInterface
         $result = [];
 
         $visibleProps = get_class_vars(get_called_class());
-        unset($visibleProps['useCustomFieldNames']);
 
         // render column names
         foreach ($visibleProps as $propertyName => $value)
@@ -130,16 +129,16 @@ abstract class Data implements DataInterface
             // get from getter
             if (method_exists($this, $getMethodName))
             {
-                $result[$propertyName] = $this->$getMethodName();
+                $result[$fieldName] = $this->$getMethodName();
                 continue;
             }
 
             // get from field
             if (property_exists($this, $propertyName))
             {
-                if ($propertyName !== 'internalChecksum')
+                if ($propertyName !== 'internalChecksum' && $propertyName !== 'useCustomFieldNames')
                 {
-                    $result[$propertyName] = $this->$propertyName;
+                    $result[$fieldName] = $this->$propertyName;
                 }
             }
         }
