@@ -105,6 +105,7 @@ abstract class Data implements DataInterface
         $result = [];
 
         $visibleProps = get_class_vars(get_called_class());
+        unset($visibleProps['useCustomFieldNames']);
 
         // render column names
         foreach ($visibleProps as $propertyName => $value)
